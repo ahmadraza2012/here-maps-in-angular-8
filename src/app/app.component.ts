@@ -85,7 +85,7 @@ export class AppComponent {
 
     let marker = new H.map.Marker(coordinates,{icon: this.defaultIcon,});
     marker.setData("<p>" + data.title + "<br>" + data.vicinity + "</p>");
-    marker.addEventListener('mouseover', event => {
+    marker.addEventListener('click', event => {
         let bubble =  new H.ui.InfoBubble(event.target.getGeometry(), {
             content: event.target.getData()
         });
