@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  _apykey: 'mzTXiIynIYkP4lliCoMD2-dRi7C9HOXY2I-BH47KGGc'
+  _apykey: '{YOUR_API_KEY_HERE}'
 };
 
 /*
