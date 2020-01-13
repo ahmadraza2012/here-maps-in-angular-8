@@ -3,10 +3,12 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
+import { DefaultMapComponent } from './default-map/default-map.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    DefaultMapComponent
   ],
   imports: [
     BrowserModule,
