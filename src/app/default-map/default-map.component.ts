@@ -21,7 +21,6 @@ export class DefaultMapComponent implements OnInit {
   
   private platform: any;  
   private map: any;  
-  
   private ui: any;
   
   public constructor(private locationService: LocationService) {  
@@ -41,12 +40,15 @@ export class DefaultMapComponent implements OnInit {
       this.lng = pos.lng;
       this.showDefaultMap();
     })
-    .catch(error => 
-      alert("Please allow your current location in order to see hotels near you."+ error)
+    .catch(error => {
+      alert("Please allow your current location in order to see hotels near you. Currently, showing default location: Berlin")
+      this.showDefaultMap(false);
+    }
     );
+    
   }
 
-  private showDefaultMap(){
+  private showDefaultMap(get_hotels: boolean= true){
     let pixelRatio = window.devicePixelRatio || 1;  
     let defaultLayers = this.platform.createDefaultLayers({  
       tileSize: pixelRatio === 1 ? 256 : 512,  
@@ -59,8 +61,9 @@ export class DefaultMapComponent implements OnInit {
     new H.mapevents.Behavior(new H.mapevents.MapEvents(this.map));
     this.ui = H.ui.UI.createDefault(this.map, defaultLayers);
     this.map.setCenter({ lat: this.lat, lng: this.lng });  
-    this.map.setZoom(14);  
-    this.places(this.lat,this.lng);
+    this.map.setZoom(14);
+    if(get_hotels)  
+      this.places(this.lat,this.lng);
   }
 
   private places(lat,lng) {  
