@@ -1,4 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef, Input } from '@angular/core';  
+import { LocationServiceService } from './location-service.service';
+import { environment } from './../environments/environment';
+
 declare var H: any;  
   
 @Component({  
@@ -7,39 +10,47 @@ declare var H: any;
   styleUrls: ['./app.component.css']  
 })  
 export class AppComponent {  
-  title = 'HereMapDemo';
+  title = 'Hotels Near Me';
   
   @ViewChild("map", { static: false }) public mapElement: ElementRef;  
   
-  public lat: any = 52.5159;  
-  public lng: any = 13.3777;  
+  public lat: any;  
+  public lng: any;  
   
-  public width: any = '1830px';  
-  public height: any = '930px';  
+  public width: any = '100%';  
+  public height: any = '98vh';  
   
   private platform: any;  
   private map: any;  
   
-  private _apykey: string = 'mzTXiIynIYkP4lliCoMD2-dRi7C9HOXY2I-BH47KGGc'
-  public query: string;  
-   
-  public address: string = '';
-  
+  private _apykey: string = environment._apykey;
   private ui: any;
   
-  public constructor() {  
-    this.query = "";  
+  public constructor(private locationService: LocationServiceService) {  
   }
   private defaultIcon = new H.map.Icon("assets/imgs/03.icon", {size: {w: 45, h: 45}});
   
   public ngOnInit() {  
-
       this.platform = new H.service.Platform({
         apikey: this._apykey
       });
   }  
   
-  public ngAfterViewInit() {  
+  public ngAfterViewInit() {
+    this.locationService.getPosition().then(pos=>
+    {
+      console.log(`Positon: ${pos.lng.toFixed(4)} ${pos.lat.toFixed(4)}`);
+      // '52.5159,13.3777',
+      // this.lat = '52.5159';
+      // this.lng = '13.3777';
+
+       this.lat = pos.lat;
+       this.lng = pos.lng;
+      this.showDefaultMap();
+    });
+  }
+
+  private showDefaultMap(){
     let pixelRatio = window.devicePixelRatio || 1;  
     let defaultLayers = this.platform.createDefaultLayers({  
       tileSize: pixelRatio === 1 ? 256 : 512,  
@@ -51,18 +62,16 @@ export class AppComponent {
   
     new H.mapevents.Behavior(new H.mapevents.MapEvents(this.map));
     this.ui = H.ui.UI.createDefault(this.map, defaultLayers);
-  
     this.map.setCenter({ lat: this.lat, lng: this.lng });  
     this.map.setZoom(14);  
+    this.places(this.lat,this.lng);
+  }
 
-    this.places();
-
-  }  
-
-  private places() {  
+  private places(lat,lng) {  
 
     this.platform.getPlacesService().explore({
-      at: '52.5159,13.3777',
+      // at: '52.5159,13.3777',
+      at: `${lat},${lng}`,
       cat: 'restaurant',
       }, 
       (data) => {
@@ -76,23 +85,17 @@ export class AppComponent {
    
   } 
   
-  private dropMarker(coordinates: any, data: any) {  
-    // let marker = new H.map.Marker(coordinates);  
-    // marker.setData("<p>" + data.title + "<br>" + data.vicinity + "</p>");  
-    
-    // this.map.addObject(marker);
-
+  private dropMarker(coordinates: any, data: any) {
 
     let marker = new H.map.Marker(coordinates,{icon: this.defaultIcon,});
     marker.setData("<p>" + data.title + "<br>" + data.vicinity + "</p>");
-    marker.addEventListener('click', event => {
+    marker.addEventListener("tap", event => {
         let bubble =  new H.ui.InfoBubble(event.target.getGeometry(), {
             content: event.target.getData()
         });
         this.ui.addBubble(bubble);
     }, false);
     this.map.addObject(marker);
-  
-  }  
-  
-} 
+  }
+
+}
